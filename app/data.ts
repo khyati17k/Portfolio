@@ -9,8 +9,8 @@ export const portfolioData: PortfolioData = {
     "github": "https://github.com/khyati17k",
     "twitter": "",
     "website": "",
-    "linkedin": "https://linkedin.com/in/khyati-kapadiya-050832168",
-    "portfolio": ""
+    "linkedin": "https://linkedin.com/in/khyati-kapadiya-050832168"
+   
   },
   "phone": "+91 6351672692 9",
   "skills": [
