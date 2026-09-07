@@ -1,3 +1,8 @@
+export interface SkillGroup {
+    title: string;
+    items: string[];
+}
+
 export interface PortfolioData {
     name: string;
     email: string;
@@ -5,10 +10,11 @@ export interface PortfolioData {
     location: string;
     bio: string;
     role: string;
-    skills: string[];
+    skills: SkillGroup[];
     experience: ExperienceItem[];
     education: EducationItem[];
     projects: ProjectItem[];
+    articles: ArticleItem[];
     certifications?: CertificationItem[];
     links: SocialLinks;
 }
@@ -36,6 +42,16 @@ export interface ProjectItem {
     technologies: string[];
     url?: string;
     github?: string;
+    result?: string;
+    video?: string;
+}
+
+export interface ArticleItem {
+    title: string;
+    venue: string;
+    year: string;
+    description: string;
+    url?: string;
 }
 
 export interface CertificationItem {

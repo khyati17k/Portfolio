@@ -3,7 +3,7 @@
 import { portfolioData } from './data';
 
 import { useEffect, useRef } from 'react';
-import { Mail, Github, Linkedin, ArrowDown, Play } from 'lucide-react';
+import { Mail, Github, Linkedin, ArrowDown, Play, Download } from 'lucide-react';
 import { useSmoothScroll, gsap, ScrollTrigger } from '../scroll/useSmoothScroll';
 
 
@@ -20,6 +20,18 @@ export default function Page() {
     const contactRef = useRef<HTMLDivElement>(null);
 
     useSmoothScroll({ lerp: 0.08, duration: 1.4 });
+
+    useEffect(() => {
+        const incrementVisit = async () => {
+            try {
+                await fetch('/api/view', { method: 'POST' });
+            } catch (error) {
+                console.error('Failed to track visit', error);
+            }
+        };
+
+        incrementVisit();
+    }, []);
 
     useEffect(() => {
         // Delay so Lenis (from useSmoothScroll) is fully initialised
@@ -198,7 +210,7 @@ export default function Page() {
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <span className="text-sm font-bold tracking-[0.3em] uppercase">{d.name?.split(' ')[0] || 'Portfolio'}</span>
                     <div className="hidden md:flex gap-10 text-xs tracking-[0.2em] uppercase font-medium">
-                        {['Aboutme', 'Skills', 'Work', 'Contact'].map(item => (
+                        {['Aboutme', 'Skills', 'Projects', 'Experience', 'Articles', 'Contact'].map(item => (
                             <a key={item} href={`#${item.toLowerCase()}`} className="hover:opacity-50 transition-opacity duration-500">{item}</a>
                         ))}
                     </div>
@@ -274,12 +286,14 @@ export default function Page() {
                         <div className="w-12 h-[1px] bg-white/20" />
                     </div>
                     <div className="reveal-up">
-                        <p className="text-2xl md:text-4xl font-light leading-relaxed text-white/80" style={{ fontFamily: "'Playfair Display', serif" }}>
-                            I am an aspiring Machine Learning Engineer with hands-on experience
-                            in building end-to-end ML systems. I focus on enhancing accuracy and
-                            optimizing performance while handling large-scale datasets. I am adept
-                            at utilizing modern tools and frameworks to deploy ML-powered
-                            solutions effectively
+                        <p className="text-2xl md:text-4xl font-light leading-relaxed text-white/80 text-justify"  style={{ fontFamily: "'Playfair Display', serif" }}>
+                            I am a Machine Learning Engineer with an M.Tech in Computer Science, 
+                            passionate about building intelligent, production-ready systems.
+                            From fraud detection and image classification to RAG-powered LLM 
+                            applications, I build practical ML solutions that bridge the gap 
+                            between experimentation and real-world impact—with a focus on 
+                            performance, scalability, and deployment.
+
                         </p>
                     </div>
                     
@@ -287,18 +301,20 @@ export default function Page() {
             </section>
 
             {/* ===== SKILLS / CRAFT ===== */}
-            <section id="craft" ref={skillsRef} className="relative py-40 px-6">
-                <div className="max-w-4xl mx-auto">
-                    <p className="text-xs tracking-[0.5em] uppercase text-white/30 mb-6">Skills</p>
-                    <div className="w-12 h-[1px] bg-white/20 mb-16" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {d.skills.map((skill, i) => (
-                            <div key={skill} className="skill-item group flex items-center gap-6 py-5 border-b border-white/5 hover:border-white/20 transition-colors duration-500">
-                                <span className="text-xs text-white/20 font-mono w-8">{String(i + 1).padStart(2, '0')}</span>
-                                <span className="text-xl md:text-2xl font-light text-white/70 group-hover:text-white transition-colors duration-500">{skill}</span>
-                                <div className="flex-1" />
-                                <div className="w-24 h-[2px] bg-white/5 rounded-full overflow-hidden">
-                                    <div className="h-full bg-white/40 rounded-full" style={{ width: `${75 + Math.random() * 25}%` }} />
+            <section id="skills" ref={skillsRef} className="relative py-20 px-6">
+                <div className="max-w-5xl mx-auto">
+                    <p className="text-xs tracking-[0.5em] uppercase text-white/30 mb-4">Skills</p>
+                    <div className="w-12 h-[1px] bg-white/20 mb-12" />
+                    <div className="space-y-6">
+                        {d.skills.map((group, groupIndex) => (
+                            <div key={group.title} className="skill-item group rounded-2xl border border-white/5 bg-white/[0.02] p-4 md:p-6">
+                                <h3 className="text-xs md:text-sm tracking-[0.25em] uppercase text-white/50 mb-3">{group.title}</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {group.items.map((skill) => (
+                                        <span key={skill} className="px-3 py-1 rounded-full border border-white/10 bg-white/[0.03] text-xs text-white/75 transition-colors duration-300 hover:border-white/20 hover:text-white">
+                                            {skill}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
                         ))}
@@ -307,7 +323,7 @@ export default function Page() {
             </section>
 
             {/* ===== PROJECTS / WORK - Horizontal Scroll ===== */}
-            <section id="work" ref={projectsRef} className="relative h-screen overflow-hidden">
+            <section id="projects" ref={projectsRef} className="relative h-screen overflow-hidden">
                 <div className="projects-track flex items-center h-full gap-8 pl-[10vw] pr-[30vw]">
                     {/* Section title card */}
                     <div className="flex-shrink-0 w-[40vw] md:w-[30vw] flex flex-col justify-center">
@@ -322,7 +338,7 @@ export default function Page() {
                     {d.projects.map((project, i) => (
                         <div
                             key={i}
-                            className={`flex-shrink-0 w-[80vw] md:w-[45vw] h-[70vh] rounded-2xl overflow-hidden relative group ${project.url || project.github ? 'cursor-pointer' : ''}`}
+                            className={`flex-shrink-0 w-[80vw] md:w-[45vw] h-[80vh] rounded-2xl overflow-hidden relative group ${project.url || project.github ? 'cursor-pointer' : ''}`}
                             onClick={() => {
                                 const url = project.url || project.github;
                                 if (url) window.open(url, '_blank', 'noopener,noreferrer');
@@ -336,32 +352,87 @@ export default function Page() {
                                 ][i % 4]
                             }}
                         >
-                            {/* Project number */}
-                            <div className="absolute top-8 left-8 text-[8rem] font-black text-white/[0.03] leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
-                                {String(i + 1).padStart(2, '0')}
-                            </div>
-
-                            <div className="absolute inset-0 p-10 flex flex-col justify-end">
-                                <div className="flex flex-wrap gap-2 mb-4">
+                            <div className="absolute inset-0 p-12 flex flex-col justify-end">
+                                <div className="absolute top-8 left-8 z-40 flex flex-wrap gap-2">
                                     {project.technologies?.map(tech => (
-                                        <span key={tech} className="px-3 py-1 text-[10px] tracking-[0.15em] uppercase bg-white/5 border border-white/10 rounded-full text-white/50">
+                                        <span key={tech} className="px-3 py-1 text-[10px] tracking-[0.15em] uppercase bg-white/6 border border-white/12 rounded-full text-white/80">
                                             {tech}
                                         </span>
                                     ))}
                                 </div>
                                 <h3 className="text-3xl md:text-4xl font-bold mb-3 group-hover:translate-x-2 transition-transform duration-500">{project.name}</h3>
                                 <p className="text-white/40 text-lg max-w-md">{project.description}</p>
-                            </div>
+                                {project.result && (
+                                    <p className="mt-4 text-sm text-white/60">Result: {project.result}</p>
+                                )}
+                                {project.video && (
+                                    <div className="mt-6 flex items-center gap-3 z-20">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const v = project.video || '';
+                                                if (!v) return;
+                                                if (v.startsWith('http')) {
+                                                    window.open(v, '_blank', 'noopener,noreferrer');
+                                                } else {
+                                                    window.open(v, '_blank', 'noopener,noreferrer');
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.08] border border-white/10 px-4 py-2 rounded-full text-sm text-white/90"
+                                        >
+                                            <Play className="w-4 h-4" />
+                                            Watch Demo
+                                        </button>
 
-                            {/* Hover overlay */}
-                            <div className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                                        <a
+                                            href={project.video}
+                                            onClick={(e) => e.stopPropagation()}
+                                            download
+                                            className="flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.08] border border-white/10 px-4 py-2 rounded-full text-sm text-white/90"
+                                        >
+                                            <Download className="w-4 h-4" />
+                                            Download
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
             </section>
 
+            {/* ===== ARTICLES / PUBLICATIONS ===== */}
+            <section id="articles" className="relative py-20 px-6">
+                <div className="max-w-5xl mx-auto">
+                    <p className="text-xs tracking-[0.5em] uppercase text-white/30 mb-4">Article / Publication</p>
+                    <div className="w-12 h-[1px] bg-white/20 mb-12" />
+
+                    <div className="space-y-6">
+                        {d.articles.map((article, i) => (
+                            <div
+                                key={i}
+                                className="group rounded-2xl border border-white/5 bg-white/[0.02] p-4 md:p-6 hover:border-white/15 transition-all duration-500"
+                                onClick={() => article.url && window.open(article.url, '_blank', 'noopener,noreferrer')}
+                                style={{ cursor: article.url ? 'pointer' : 'default' }}
+                            >
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+                                    <div>
+                                        <p className="text-xs tracking-[0.2em] uppercase text-white/40 mb-2">{article.venue}</p>
+                                        <h3 className="text-xl md:text-2xl font-bold leading-snug">{article.title}</h3>
+                                    </div>
+                                    <span className="text-xs tracking-[0.2em] uppercase text-white/20 border border-white/10 px-3 py-1 rounded-full">
+                                        {article.year}
+                                    </span>
+                                </div>
+                                <p className="text-white/50 text-base leading-relaxed max-w-3xl">{article.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* ===== EXPERIENCE ===== */}
-            <section ref={experienceRef} className="relative py-40 px-6">
+            <section id="experience" ref={experienceRef} className="relative py-40 px-6">
                 <div className="max-w-4xl mx-auto">
                     <p className="text-xs tracking-[0.5em] uppercase text-white/30 mb-6">Experience</p>
                     <div className="w-12 h-[1px] bg-white/20 mb-16" />
@@ -378,7 +449,13 @@ export default function Page() {
                                         {exp.startDate} — {exp.endDate}
                                     </span>
                                 </div>
-                                <p className="text-white/50 text-lg leading-relaxed mb-6">{exp.description}</p>
+                                {exp.description && (
+                                    <ul className="text-white/50 text-lg leading-relaxed mb-6 list-disc list-inside space-y-2">
+                                        {exp.description.split('\n').map((line, idx) => (
+                                            line.trim() ? <li key={idx}>{line.trim()}</li> : null
+                                        ))}
+                                    </ul>
+                                )}
                                 {exp.highlights && exp.highlights.length > 0 && (
                                     <div className="flex flex-wrap gap-3">
                                         {exp.highlights.map((h, j) => (
@@ -418,9 +495,13 @@ export default function Page() {
                     <p className="text-xs tracking-[0.5em] uppercase text-white/30 mb-8">Contact Me</p>
                     
                     <p className="text-white/40 text-lg mb-12 max-w-md mx-auto">
-                        I’m actively looking for Machine Learning / Data Scientist opportunities. Feel free to reach out for collaborations, projects, or full-time roles.
+                        I’m actively looking for Machine Learning / Data Scientist opportunities. Feel free to reach out for collaborations, projects, full-time, contract, part-time roles.
                     </p>
-                    <div className="flex justify-center gap-6">
+                    <div className="flex justify-center gap-6 flex-wrap">
+                        <a href="/resume.pdf" download className="group flex items-center gap-3 px-8 py-4 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-500">
+                            <Download className="w-5 h-5" />
+                            <span className="text-sm tracking-[0.1em] uppercase font-medium">Resume</span>
+                        </a>
                         <a href={`mailto:${d.email}`} className="group flex items-center gap-3 px-8 py-4 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-500">
                             <Mail className="w-5 h-5" />
                             <span className="text-sm tracking-[0.1em] uppercase font-medium">Email</span>
